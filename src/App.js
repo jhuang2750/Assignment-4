@@ -19,7 +19,7 @@ class App extends Component {
   constructor() {  // Create and initialize state
     super(); 
     this.state = {
-      accountBalance: 1234567.89,
+      accountBalance: 0,
       debitList: [],
       creditList: [],
       currentUser: {
@@ -29,12 +29,12 @@ class App extends Component {
     }
   }
 
-  async componentDidMount(){
-    let debitAPI = 'https://moj-api.herokuapp.com/debits';
+  async componentDidMount(){                                                                 //addapted from code shown in lectures
+    let debitAPI = 'https://moj-api.herokuapp.com/debits';                                  //access debit API
     try {
       let response = await axios.get(debitAPI);
       console.log(response); 
-      this.setState({debitList: response.data});
+      this.setState({debitList: response.data});                                            //fill debit array
       //Personal reminder: sum the total 
     } 
     catch (error) {
@@ -44,11 +44,11 @@ class App extends Component {
       }    
     }
 
-    let creditAPI = 'https://moj-api.herokuapp.com/credits';
+    let creditAPI = 'https://moj-api.herokuapp.com/credits';                                //access credit API
     try {
-      let response = await axios.get(creditAPI);
+      let response = await axios.get(creditAPI);                    
       console.log(response);
-      this.setState({creditList: response.data});
+      this.setState({creditList: response.data});                                           //fill credit array
       //Personal reminder: sum the total
     }
     catch (error) {
@@ -57,17 +57,32 @@ class App extends Component {
         console.log(error.reponse.status);
       }
     }
+
+    let tmpBalance = this.state.accountBalance;                                             //should have two populated arrays
+    for(let element of this.state.creditList){                                              //+/- until we get "beginning" balance
+      tmpBalance += element.amount;
+    }
+    for(let element of this.state.debitList){
+      tmpBalance -= element.amount;
+    }
+    this.setState({accountBalance: Number(tmpBalance).toFixed(2)});                         //update accountBalance and rounding
   }
 
   addDebit = (newID, newAmount, newDescr, newDate) =>{
+    //console.log("test in debit");
     let tmpDebitList = this.state.debitList;
-    tmpDebitList.push({id: newID, amount: newAmount, description: newDescr, date: newDate});
+    tmpDebitList.push({id: newID, amount: newAmount, description: newDescr, date: newDate});          //same as addCredit, just different way of  making object
     this.setState({debitList: tmpDebitList});
+
+    let tmpBalance = this.state.accountBalance;
+    tmpBalance -= newAmount;
+    this.setState({accountBalance: Number(tmpBalance).toFixed(2)});
   }
 
   addCredit = (newID, newAmount, newDescr, newDate) =>{
-    let tmpCreditList = this.state.debitList;
-    let creditObj = {
+    //console.log("test in credit");
+    let tmpCreditList = this.state.creditList;                                  //need a array for setState
+    let creditObj = {                                                           //create an object to append to array
       id: newID,
       amount: newAmount,
       description: newDescr,
@@ -75,6 +90,13 @@ class App extends Component {
     }
     tmpCreditList.push(creditObj);
     this.setState({creditList: tmpCreditList});
+
+    let tmpBalance = this.state.accountBalance;
+    //tmpBalance = Number(tmpBalance);
+    newAmount = Number(newAmount);                                              //adding numbers were concatenating to the end of balance rather than adding
+    tmpBalance = Number(tmpBalance);                                            //I suspect lines 85-89 resulted in some strings instead of numbers, only happens here
+    tmpBalance += newAmount;                                                    //converted everything to numbers for a quick fix
+    this.setState({accountBalance: tmpBalance.toFixed(2)});                     //rounding
   }
   // Update state's currentUser (userName) after "Log In" button is clicked
   mockLogIn = (logInInfo) => {  
@@ -91,9 +113,9 @@ class App extends Component {
       <UserProfile userName={this.state.currentUser.userName} memberSince={this.state.currentUser.memberSince} />
     );
     const LogInComponent = () => (<LogIn user={this.state.currentUser} mockLogIn={this.mockLogIn} />)
-    const DebitsComponent = () => (<Debits debits={this.state.debitList} addDebit={this.addDebit}/>) 
+    const DebitsComponent = () => (<Debits debits={this.state.debitList} addDebit={this.addDebit} accountBalance={this.state.accountBalance}/>) 
     //Personal reminder: add CreditsComponent later
-    const CreditsComponent = () => (<Credits credits={this.state.creditList} addCredit={this.addCredit}/>)
+    const CreditsComponent = () => (<Credits credits={this.state.creditList} addCredit={this.addCredit} accountBalance={this.state.accountBalance}/>)
     // Important: Include the "basename" in Router, which is needed for deploying the React app to GitHub Pages
     return (
       <Router basename="/bank-of-react-example-code-gh-pages">
