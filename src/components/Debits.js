@@ -15,6 +15,14 @@ const Debits = (props) => {
       return <li key={debit.id}>{debit.amount} {debit.description} {date}</li>
     }) 
   }
+
+  const newDebit = (event) =>{
+    let newDate = new Date().toISOString();
+    let newAmount = event.target.amount.value;
+    let newDescr = event.target.description.value;
+    let newID = newDate;
+    this.props.addDebit(newID, newAmount, newDescr, newDate);
+  }
   // Render the list of Debit items and a form to input new Debit item
   return (
     <div>
@@ -22,7 +30,7 @@ const Debits = (props) => {
 
       {debitsView()}
 
-      <form onSubmit={props.addDebit}>
+      <form onSubmit={newDebit}>
         <input type="text" name="description" />
         <input type="number" name="amount" />
         <button type="submit">Add Debit</button>
