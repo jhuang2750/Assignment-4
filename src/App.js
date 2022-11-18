@@ -21,6 +21,7 @@ class App extends Component {
     this.state = {
       accountBalance: 1234567.89,
       debitList: [],
+      creditList: [],
       currentUser: {
         userName: 'Joe Smith',
         memberSince: '11/22/99',
@@ -42,12 +43,38 @@ class App extends Component {
         console.log(error.response.status); 
       }    
     }
+
+    let creditAPI = 'https://moj-api.herokuapp.com/credits';
+    try {
+      let response = await axios.get(creditAPI);
+      console.log(response);
+      this.setState({creditList: response.data});
+      //Personal reminder: sum the total
+    }
+    catch (error) {
+      if (error.response){
+        console.log(error.reponse.data);
+        console.log(error.reponse.status);
+      }
+    }
   }
 
   addDebit = (newID, newAmount, newDescr, newDate) =>{
     let tmpDebitList = this.state.debitList;
     tmpDebitList.push({id: newID, amount: newAmount, description: newDescr, date: newDate});
     this.setState({debitList: tmpDebitList});
+  }
+
+  addCredit = (newID, newAmount, newDescr, newDate) =>{
+    let tmpCreditList = this.state.debitList;
+    let creditObj = {
+      id: newID,
+      amount: newAmount,
+      description: newDescr,
+      date: newDate
+    }
+    tmpCreditList.push(creditObj);
+    this.setState({creditList: tmpCreditList});
   }
   // Update state's currentUser (userName) after "Log In" button is clicked
   mockLogIn = (logInInfo) => {  
@@ -66,7 +93,7 @@ class App extends Component {
     const LogInComponent = () => (<LogIn user={this.state.currentUser} mockLogIn={this.mockLogIn} />)
     const DebitsComponent = () => (<Debits debits={this.state.debitList} addDebit={this.addDebit}/>) 
     //Personal reminder: add CreditsComponent later
-
+    const CreditsComponent = () => (<Credits credits={this.state.creditList} addCredit={this.addCredit}/>)
     // Important: Include the "basename" in Router, which is needed for deploying the React app to GitHub Pages
     return (
       <Router basename="/bank-of-react-example-code-gh-pages">
@@ -74,7 +101,7 @@ class App extends Component {
           <Route exact path="/" render={HomeComponent}/>
           <Route exact path="/userProfile" render={UserProfileComponent}/>
           <Route exact path="/login" render={LogInComponent}/>
-          <Route exact path="/credits" render={Credits}/>
+          <Route exact path="/credits" render={CreditsComponent}/>
           <Route exact path="/debits" render={DebitsComponent}/>
         </div>
       </Router>
