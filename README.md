@@ -1,3 +1,7 @@
+Jack Huang              jhuang2750
+<npm run deploy> didn't finish even after hours, last line in console was <gh-pages -d build>. No github pages link.
+
+
 # bank-of-react-example-code-gh-pages
 This repository contains a React application example on how to implement client-side routing with React Router and its components including Route, Router Link, and Redirect.
 
