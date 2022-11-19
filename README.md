@@ -1,5 +1,5 @@
 Jack Huang              jhuang2750
-<npm run deploy> didn't finish even after hours, last line in console was <gh-pages -d build>. No github pages link.
+"npm run deploy" command didn't finish even after hours, last line in console was ""gh-pages -d build". No github pages link.
 
 
 # bank-of-react-example-code-gh-pages
